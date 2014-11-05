@@ -6,4 +6,7 @@
 meteor-platform
 insecure
 iron:router
+meteorhacks:npm
 
+
+npm-container
