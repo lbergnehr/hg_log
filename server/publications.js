@@ -16,7 +16,8 @@ Meteor.publish("changesets", function(repoName, searchString) {
   var handle = Meteor.setInterval(function() {
     hg.log(fullRepoPath, {
       "-r": "desc(" + searchString + ")",
-      "--template": "xml"
+      "--template": "xml",
+      "-v": ""
     }, function(error, output) {
       if (error) {
         console.log(error);
@@ -27,9 +28,12 @@ Meteor.publish("changesets", function(repoName, searchString) {
         return res + item.body;
       }, "");
 
+      console.log("XML: " + xml);
+
       if (xml) {
         var obj = parser.toJson(xml, {
-          object: true
+          object: true,
+          trim: false
         });
 
         var entries = obj.log.logentry;

@@ -7,5 +7,10 @@
 </template>
 
 <template name="changeset">
-  {{msg.$t}}
+<h3>{{author.$t}} ({{author.email}})</h3>
+<small>{{date}}</small>
+<pre>
+{{msg.$t}}
+</pre>
+<hr>
 </template>
