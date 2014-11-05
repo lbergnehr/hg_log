@@ -11,31 +11,35 @@ Meteor.publish("changesets", function(repoName, searchString) {
 
   var fullRepoPath = Npm.require("path").join(repoStoreRootPath, repoName);
 
+  var parser = Meteor.npmRequire("xml2json");
+
   var handle = Meteor.setInterval(function() {
     hg.log(fullRepoPath, {
       "-r": "desc(" + searchString + ")",
-      "--template": "{node|short};{desc}\n"
+      "--template": "xml"
     }, function(error, output) {
       if (error) {
         console.log(error);
         throw error;
       }
 
-      if (output) {
-        output.forEach(function(line) {
-          var goodLine = line.body.trim();
-          if (!goodLine) {
-            return;
-          }
+      var xml = _(output).reduce(function(res, item) {
+        return res + item.body;
+      }, "");
 
-          var ar = goodLine.split(";");
-          var id = ar[0];
-          var desc = ar[1];
+      if (xml) {
+        var obj = parser.toJson(xml, {
+          object: true
+        });
 
-          self.added("changesets", new Mongo.ObjectID(id + id), {
-            id: id,
-            desc: desc
-          });
+        var entries = obj.log.logentry;
+        if (!_.isArray(entries)) {
+          entries = [entries];
+        }
+
+        entries.forEach(function(entry) {
+          var id = entry.node.substring(0, 24);
+          self.added("changesets", new Mongo.ObjectID(id), entry);
         });
       }
     });
@@ -43,6 +47,5 @@ Meteor.publish("changesets", function(repoName, searchString) {
 
   this.onStop(function() {
     Meteor.clearTimeout(handle);
-    console.log("Cleared timeout");
   });
 });
