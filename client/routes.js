@@ -1,12 +1,12 @@
 Router.route("changesets", {
-  path: "/:searchString",
+  path: "/:repoName/:searchString",
 
   template: "changesets",
 
   waitOn: function() {
     var params = this.params;
 
-    return Meteor.subscribe("changesets", params.searchString);
+    return Meteor.subscribe("changesets", params.repoName, params.searchString);
   },
 
   data: function() {

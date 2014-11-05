@@ -1,12 +1,16 @@
-Meteor.publish("changesets", function(searchString) {
+Meteor.publish("changesets", function(repoName, searchString) {
+  check(repoName, String);
+  check(searchString, String);
+
   var hg = Meteor.npmRequire("hg");
 
   var self = this;
   this.ready();
-  var destPath = "/tmp/test_repo";
+
+  var fullRepoPath = Npm.require("path").join(RepoStoreRootPath, repoName);
 
   var handle = Meteor.setInterval(function() {
-    hg.log(destPath, {
+    hg.log(fullRepoPath, {
       "-r": "desc(" + searchString + ")",
       "--template": "{node|short};{desc}\n"
     }, function(error, output) {
