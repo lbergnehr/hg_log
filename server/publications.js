@@ -28,8 +28,6 @@ Meteor.publish("changesets", function(repoName, searchString) {
         return res + item.body;
       }, "");
 
-      console.log("XML: " + xml);
-
       if (xml) {
         var obj = parser.toJson(xml, {
           object: true,
