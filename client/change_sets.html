@@ -7,19 +7,22 @@
 </template>
 
 <template name="changeset">
-<h3>{{author.$t}} ({{author.email}})</h3>
-<small>{{date}}</small>
-<pre>
-{{msg.$t}}
-</pre>
+<h3 class="author"><span class="name">{{author.$t}}</span> <span class="email">({{author.email}})</span></h3>
+  <small>{{date}}</small>
 
-{{#each filePaths}}
-<small>
-  <div>
-    {{$t}}
-  </div>
+  {{! Commit message }}
+  <p class="message">
+    <pre>{{msg.$t}}</pre>
+  </p>
+
+  {{! Files }}
+  {{#each filePaths}}
+  <small>
+    <div class="file-name">
+      {{$t}}
+    </div>
 </small>
-{{/each}}
+  {{/each}}
 
-<hr>
+  <hr>
 </template>

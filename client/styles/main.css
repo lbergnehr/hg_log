@@ -1,7 +1,14 @@
-* {
-  font-family: "Helvetica";
+/*
+ * Common stuff
+ */
+html,
+body {
   margin: 0;
   padding: 0;
+}
+
+* {
+  font-family: "Helvetica Neue";
 }
 
 h3 {
@@ -10,4 +17,19 @@ h3 {
 
 small {
   color: #333;
+}
+
+/*
+ * Changeset
+ */
+.changeset {
+  margin-left: 5px;
+}
+
+.message {
+  font-size: 1.2em;
+}
+
+.file-name {
+
 }
