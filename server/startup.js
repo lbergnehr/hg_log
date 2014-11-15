@@ -16,8 +16,9 @@ Meteor.startup(function() {
         "-R": repositoryPath
       }, function(error) {
         if (error) {
-          console.log(error);
-          throw error;
+          console.log("Error pulling in " + repositoryPath);
+          console.log("  " + error);
+          //throw error;
         }
       });
     });

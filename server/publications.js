@@ -40,6 +40,12 @@ Meteor.publish("changesets", function(repoName, searchString) {
         }
 
         entries.forEach(function(entry) {
+
+          traverseObject(entry, _.partial(renameKey, "$t", "text"));
+          traverseObject(entry, _.partial(deleteKey, "xml:space"));
+
+          // uncomment for useful debug log
+          //console.log(JSON.stringify(entry, undefined, 2))
           var id = entry.node.substring(0, 24);
           self.added("changesets", new Mongo.ObjectID(id), entry);
         });
@@ -50,4 +56,59 @@ Meteor.publish("changesets", function(repoName, searchString) {
   this.onStop(function() {
     Meteor.clearTimeout(handle);
   });
+
 });
+
+var deleteKey = function(key, o) {
+  delete o[key];
+}
+
+var renameKey = function(oldKeyName, newKeyName, o) {
+  if (o.hasOwnProperty(oldKeyName)) {
+    o[newKeyName] = o[oldKeyName];
+    delete o[oldKeyName];
+  }
+}
+
+// Deep traverse of an object, applying function
+// func to each oject. func takes one parameter, the object.
+// returns the object.
+var traverseObject = function(o, func) {
+  if (typeof(o) == "array") {
+    _(o).forEach(function(element) {
+      traverseObject(element, func);
+    });
+  } else if (typeof(o) == "object") {
+    func(o);
+    _(o).keys()
+      .forEach(function(key) {
+        var value = o[key];
+        if (value !== null && typeof(value) == "object") {
+          traverseObject(o[key], func)
+        }
+      });
+  }
+  return o;
+}
+
+/*
+ {
+   "revision": 0,
+   "node": "a3a311c43522bfaadcda246631ff40370158b9ee",
+   "tag": "tip",
+   "author": {
+     "email": "noresjo@gmail.com",
+     "text": "Noresjo"
+   },
+   "date": "2014-11-06T21:35:20+01:00",
+   "msg": {
+     "text": "commiting"
+   },
+   "paths": {
+     "path": {
+       "action": "A",
+       "text": "bar.txt"
+     }
+   }
+ }
+*/

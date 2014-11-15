@@ -15,7 +15,7 @@
           "version": "2.4.1"
         },
         "winston": {
-          "version": "0.8.2",
+          "version": "0.8.3",
           "dependencies": {
             "async": {
               "version": "0.2.10"
