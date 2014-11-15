@@ -1,6 +1,5 @@
 Meteor.publish("changesets", function(repoName, searchString) {
   check(repoName, String);
-  check(searchString, String);
 
   var hg = Meteor.npmRequire("hg");
 
@@ -14,11 +13,16 @@ Meteor.publish("changesets", function(repoName, searchString) {
   var parser = Meteor.npmRequire("xml2json");
 
   var handle = Meteor.setInterval(function() {
-    hg.log(fullRepoPath, {
-      "-r": "desc(" + searchString + ")",
+    var options = {
       "--template": "xml",
       "-v": ""
-    }, function(error, output) {
+    };
+
+    if (searchString) {
+      options["-r"] = "desc(" + searchString + ")";
+    }
+
+    hg.log(fullRepoPath, options, function(error, output) {
       if (error) {
         console.log(error);
         throw error;

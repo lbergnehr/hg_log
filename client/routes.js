@@ -1,5 +1,5 @@
 Router.route("changesets", {
-  path: "/:repoName/:searchString",
+  path: "/:repoName/:searchString?",
 
   template: "changesets",
 
@@ -11,8 +11,10 @@ Router.route("changesets", {
 
   data: function() {
     if (this.ready()) {
+      var reponame = this.params.repoName;
       return {
-        changesets: Changesets.find()
+        changesets: Changesets.find(),
+        repoName: reponame
       };
     }
   }

@@ -6,7 +6,7 @@ Show log entries from a Mercurial repository on a web page based on a search str
 * [Install Meteor](https://www.meteor.com/install)
 * Put Mercurial repo of your choice in `/tmp/repos/` (or whatever you configured)
 * In the root of the repository, run `meteor --settings settings.json`
-* Enter [localhost:3000/repo_to_log/string_to_search](http://localhost:3000/repo_to_log/string_to_search). The site will update as new matching changesets are committed to the repository.
+* Enter [localhost:3000/repo_to_log/string_to_search](http://localhost:3000/repo_to_log/string_to_search). The site will update as new matching changesets are committed to the repository. If string_to_search is empty, the full log will be shown.
 
 ## Configuration
 The configuraion is provided in the settings.json file that you pass to Meteor when starting the server. [settings.json](https://github.com/lbergnehr/hg_log/blob/master/settings.json) for more details.

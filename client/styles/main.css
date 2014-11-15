@@ -11,10 +11,6 @@ body {
   font-family: "Helvetica Neue";
 }
 
-h3 {
-  color: #333;
-}
-
 small {
   color: #333;
 }
@@ -24,10 +20,15 @@ small {
  */
 .changeset {
   margin-left: 5px;
+  background-color: #eee;
 }
 
 .message {
   font-size: 1.2em;
+}
+
+.author {
+  color: #333;
 }
 
 .file-name {
