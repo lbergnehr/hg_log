@@ -7,8 +7,7 @@
 </template>
 
 <template name="changeset">
-<h3 class="author"><span class="name">{{author.text}}</span> <span class="email">({{author.email}})</span></h3>
-  <small>{{date}}</small>
+<span class="name">{{author.text}}</span> <span class="email">({{author.email}})</span>, <small>{{date}}</small>
 
   {{! Commit message }}
   <p class="message">
@@ -19,7 +18,7 @@
   {{#each filePaths}}
   <small>
     <div class="file-name">
-      {{text}}
+      {{action}} - {{text}}
     </div>
   </small>
   {{/each}}
