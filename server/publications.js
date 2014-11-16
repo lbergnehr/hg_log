@@ -50,8 +50,7 @@ Meteor.publish("changesets", function(repoName, searchString) {
 
           // uncomment for useful debug log
           //console.log(JSON.stringify(entry, undefined, 2))
-          var id = entry.node.substring(0, 24);
-          self.added("changesets", new Mongo.ObjectID(id), entry);
+          self.added("changesets", entry.node, entry);
         });
       }
     });
