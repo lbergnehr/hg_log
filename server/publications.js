@@ -1,6 +1,6 @@
 Meteor.publish("changesets", function(repoName, searchString) {
   check(repoName, String);
-  check(searchString, String);
+  check(searchString, Match.OneOf(String, undefined, null));
 
   var hg = Meteor.npmRequire("hg");
 
