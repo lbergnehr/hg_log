@@ -10,13 +10,6 @@ HgLog.pullResults = function() {
   return pullResults;
 };
 
-HgLog.isPulling = function() {
-  var isPulling = pullIntervals.map(function(repo) { return { repo: repo, isPulling: true }; });
-  var isNotPulling = pullResults.map(function(x) { return { repo: x.repo, isPulling: false }; });
-
-  return isPulling.merge(isNotPulling);
-};
-
 HgLog.logResults = function(options) {
   return pullResults
     .filter(function(result) { return result.repo === options.repo; })
