@@ -7,7 +7,7 @@ Meteor.publish("changesets", function(repoName, searchString) {
   var self = this;
   this.ready();
 
-  var repoStoreRootPath = Meteor.settings.repoStoreRootPath;
+  var repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos/";
   var fullRepoPath = Npm.require("path").join(repoStoreRootPath, repoName);
 
   var handle = HgLog.logResults({repo: fullRepoPath, searchString: searchString})
