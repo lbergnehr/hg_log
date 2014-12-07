@@ -15,16 +15,15 @@ HgLog.logResults = function(options) {
     .filter(function(result) { return result.repo === options.repo; })
     .flatMap(function(result) {
       return getLogs(result.repo, options.searchString);
-    })
-    .share();
+    });
 };
 
-var pullIntervals = Rx.Observable.interval(3000)
-  .flatMap(function() { return getRepositories(repoStoreRootPath); })
-  .share();
+var pullIntervals = Rx.Observable.interval(5000)
+  .flatMap(function() { return getRepositories(repoStoreRootPath); });
 var pullResults = pullIntervals
   .flatMap(function(repoPath) { return pullRepository(repoPath); })
-  .share();
+  .share()
+  .replay(Rx.helpers.identity, 1);
 
 // Get hg log for a hg repository
 // Returns: An Observable which produces log messages from hg.
@@ -115,5 +114,6 @@ var pullRepository = function(repositoryPath) {
   var repo = new hg.HGRepo();
   return Rx.Observable.fromNodeCallback(repo.pull, repo)(repositoryPath, {
     "-R": repositoryPath
-  }).map(function(output) { return { repo: repositoryPath, output: output }; });
+  })
+  .map(function(output) { return { repo: repositoryPath, output: output }; });
 };
