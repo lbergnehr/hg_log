@@ -12,7 +12,9 @@ HgLog.pullResults = function() {
 
 HgLog.logResults = function(options) {
   return pullResults
-    .filter(function(result) { return result.repo === options.repo; })
+    .filter(function(result) {
+      return result.repo === options.repo;
+    })
     .flatMap(function(result) {
       return getLogs(result.repo, options.searchString);
     });
@@ -49,42 +51,62 @@ var getLogs = function(repoPath, searchString) {
     .flatMap(function(entries) {
       return _.isArray(entries) ? entries : [entries];
     })
-    .do(function(entry) {
-      traverseObject(entry, _.partial(renameKey, "$t", "text"));
-      traverseObject(entry, _.partial(deleteKey, "xml:space"));
-    });
+    .map(cleanUpLogEntry);
 };
 
-var deleteKey = function(key, o) {
-  delete o[key];
+var cleanUpLogEntry = function(entry) {
+
+  var cleanUpFunction = _.compose(
+    _.partial(renameProperty, "$t", "text"),
+    _.partial(deleteProperty, "xml:space")
+  );
+
+  var result = deepMap(entry, cleanUpFunction);
+
+  return result;
 }
 
-var renameKey = function(oldKeyName, newKeyName, o) {
-  if (o.hasOwnProperty(oldKeyName)) {
-    o[newKeyName] = o[oldKeyName];
-    delete o[oldKeyName];
+var deleteProperty = function(key, o) {
+  return _(o).omit(key);
+}
+
+var renameProperty = function(oldKeyName, newKeyName, o) {
+  if (_(o).has(oldKeyName)) {
+    var result = deleteProperty(oldKeyName, o);
+    result[newKeyName] = o[oldKeyName];
+    return result;
+  } else {
+    return _.clone(o);
   }
 }
 
-// Deep traverse of an object, applying function
-// func to each oject. func takes one parameter, the object.
-// returns the object.
-var traverseObject = function(o, func) {
+/*
+Deep clones an object while applying function to each object
+in the "deep" object tree.
+The function is recursibly applied to:
+- the object itself
+- all property values that are objects
+- all objects in property values that are arrays
+
+func() takes one parameter, the object. 
+func() should return the new object.
+
+deepMap returns the new object. */
+var deepMap = function(o, func) {
   if (typeof(o) == "array") {
-    _(o).forEach(function(element) {
-      traverseObject(element, func);
+    return _(o).map(function(element) {
+      deepMap(element, func);
     });
   } else if (typeof(o) == "object") {
-    func(o);
-    _(o).keys()
+    var result = func(o);
+    _(result).keys()
       .forEach(function(key) {
-        var value = o[key];
-        if (value !== null && typeof(value) == "object") {
-          traverseObject(o[key], func)
-        }
+        result[key] = deepMap(result[key], func)
       });
+    return result;
+  } else {
+    return _.clone(o);
   }
-  return o;
 }
 
 // Get hg repositories from a specified root directory.
