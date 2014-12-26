@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "hg": {
-      "version": "0.0.6",
+      "version": "0.1.0",
       "dependencies": {
         "coffee-script": {
           "version": "1.8.0",
