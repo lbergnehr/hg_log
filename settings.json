@@ -1,3 +1,4 @@
 {
-  "repoStoreRootPath": "/tmp/repos"
+  "repoStoreRootPath": "/tmp/repos/",
+  "pollInterval": 1000
 }

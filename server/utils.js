@@ -20,7 +20,7 @@ HgLog.logResults = function(options) {
     });
 };
 
-var pullIntervals = Rx.Observable.timer(0, 1000)
+var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
     return getRepositories(repoStoreRootPath);
   });
