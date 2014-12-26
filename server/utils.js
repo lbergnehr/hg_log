@@ -20,10 +20,14 @@ HgLog.logResults = function(options) {
     });
 };
 
-var pullIntervals = Rx.Observable.interval(5000)
-  .flatMap(function() { return getRepositories(repoStoreRootPath); });
+var pullIntervals = Rx.Observable.timer(0, 1000)
+  .flatMap(function() {
+    return getRepositories(repoStoreRootPath);
+  });
 var pullResults = pullIntervals
-  .flatMap(function(repoPath) { return pullRepository(repoPath); })
+  .flatMap(function(repoPath) {
+    return pullRepository(repoPath);
+  })
   .share()
   .replay(Rx.helpers.identity, 1);
 
@@ -46,7 +50,12 @@ var getLogs = function(repoPath, searchString) {
       }, "");
     })
     .filter(Rx.helpers.identity)
-    .map(function(xml) { return parser.toJson(xml, { object: true, trim: false }); })
+    .map(function(xml) {
+      return parser.toJson(xml, {
+        object: true,
+        trim: false
+      });
+    })
     .pluck("log").pluck("logentry")
     .flatMap(function(entries) {
       return _.isArray(entries) ? entries : [entries];
