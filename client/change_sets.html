@@ -2,7 +2,7 @@
   <h3>Matching change set(s) in {{repoName}}</h3>
   <div class="changesets">  
     {{#each changesets}}
-    <div class="changeset container-fluid">
+    <div class="changeset">
       {{> changeset}}
     </div>
     {{/each}}
@@ -12,21 +12,23 @@
 <template name="changeset">
 
   <div class="changesetheading">
-    <div class="author">
+    <div class="changesetauthor">
       <span class="name">{{author.text}}</span>
       <span class="email">({{author.email}})</span>
       <br/>
-      {{date}}
+      <small>
+        {{date}}
+      </small>
     </div>
     <div class="changesetsummary">
       {{changesetsummary}}
     </div>
   </div>
-  
+
   <div class="changesetbody">
     {{! Files }}
     {{#each filePaths}}
-    <div class="files">
+    <div class="changesetfiles">
       <span class="{{action}}">{{action}}</span> - {{text}}
     </div>
     {{/each}}
@@ -35,6 +37,6 @@
     <div class="changesettext">
       {{changesettext}}
     </div>
-    
+
   </div>
 </template>

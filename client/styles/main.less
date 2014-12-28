@@ -19,20 +19,13 @@ small {
 }
 
 /*
-div {
-	border: 1px;
-	border-color: #f00;
-	border-style: dashed;
-}
-*/
-/*
  * Changeset
  */
 .changesets {
 }
 
 .changeset {
-  background-color: #eee;
+  background-color: @gray-lighter;
   .container-fluid();
   margin-bottom: 5px;
 }
@@ -51,14 +44,13 @@ div {
   .make-xs-column(7);
 }
 
-.author {
-  font-size: 0.8em;
+.changesetauthor {
   color: #333;
   .make-xs-column(5);
   padding-bottom: 5px;
 }
 
-.files {  
+.changesetfiles {  
   font-size: 0.8em;
   .make-xs-column(5);
   > .M {
@@ -77,8 +69,4 @@ div {
   .make-xs-column(7);
 }
 
-
-.file-name {
-
-}
 
