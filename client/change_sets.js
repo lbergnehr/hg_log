@@ -12,5 +12,11 @@ Template.changeset.helpers({
     }
 
     return paths;
+  },
+  changesetsummary: function() {
+    return this.msg.text.split('\n')[0];
+  },
+  changesettext: function() {
+    return this.msg.text.split('\n').slice(1);
   }
 });

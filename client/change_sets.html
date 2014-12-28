@@ -1,32 +1,40 @@
 <template name="changesets">
   <h3>Matching change set(s) in {{repoName}}</h3>
-  {{#each changesets}}
-  <div class="changeset">
-    {{> changeset}}
+  <div class="changesets">  
+    {{#each changesets}}
+    <div class="changeset container-fluid">
+      {{> changeset}}
+    </div>
+    {{/each}}
   </div>
-  {{/each}}
 </template>
 
 <template name="changeset">
-  <p class="author">
-   <span class="name">{{author.text}}</span>
-   <span class="email">({{author.email}})</span>
-   , <small>{{date}}</small>
- </p>
 
- {{! Commit message }}
- <p class="message">
-  <pre>{{msg.text}}</pre>
-</p>
-
-{{! Files }}
-{{#each filePaths}}
-<small>
-  <div class="file-name">
-    {{action}} - {{text}}
+  <div class="changesetheading">
+    <div class="author">
+      <span class="name">{{author.text}}</span>
+      <span class="email">({{author.email}})</span>
+      <br/>
+      {{date}}
+    </div>
+    <div class="changesetsummary">
+      {{changesetsummary}}
+    </div>
   </div>
-</small>
-{{/each}}
+  
+  <div class="changesetbody">
+    {{! Files }}
+    {{#each filePaths}}
+    <div class="files">
+      <span class="{{action}}">{{action}}</span> - {{text}}
+    </div>
+    {{/each}}
 
-<hr>
+    {{! Commit message }}
+    <div class="changesettext">
+      {{changesettext}}
+    </div>
+    
+  </div>
 </template>

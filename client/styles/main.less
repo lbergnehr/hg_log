@@ -1,0 +1,84 @@
+@import "../lib/custom.bootstrap.import.less";
+@import "../lib/custom.bootstrap.less";
+
+/*
+ * Common stuff
+ */
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  font-family: "Helvetica Neue";
+}
+
+small {
+  color: #333;
+}
+
+/*
+div {
+	border: 1px;
+	border-color: #f00;
+	border-style: dashed;
+}
+*/
+/*
+ * Changeset
+ */
+.changesets {
+}
+
+.changeset {
+  background-color: #eee;
+  .container-fluid();
+  margin-bottom: 5px;
+}
+
+.changesetheading {
+  .make-row();
+  .clearfix();
+}
+
+.changesetbody {
+  .make-row();
+  .clearfix();
+}
+
+.changesetsummary {
+  .make-xs-column(7);
+}
+
+.author {
+  font-size: 0.8em;
+  color: #333;
+  .make-xs-column(5);
+  padding-bottom: 5px;
+}
+
+.files {  
+  font-size: 0.8em;
+  .make-xs-column(5);
+  > .M {
+    color: blue;
+  }
+  > .A {
+    color: limegreen;
+  }
+  > .R {
+    color: red;
+  }
+}
+
+.changesettext {
+	font-size: 0.8em;
+  .make-xs-column(7);
+}
+
+
+.file-name {
+
+}
+
