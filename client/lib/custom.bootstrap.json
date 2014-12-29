@@ -29,7 +29,7 @@
     "list-group": false,
     "panels": false,
     "responsive-embed": false,
-    "wells": false,
+    "wells": true,
     "close": false,
 
     "component-animations": false,

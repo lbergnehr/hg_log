@@ -2,7 +2,21 @@ HgLog = {};
 
 var Rx = Meteor.npmRequire("Rx");
 var hg = Meteor.npmRequire("hg");
-var parser = Meteor.npmRequire("xml2json");
+var xml2js = Meteor.npmRequire("xml2js");
+
+var parser = new xml2js.Parser({
+  mergeAttrs: true,
+  explicitArray: false,
+  charkey: "text",
+  strict: false,
+  normalizeTags: true,
+  attrNameProcessors: [
+
+    function(attr) {
+      return attr.toLowerCase();
+    }
+  ]
+});
 
 var repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
 
@@ -50,44 +64,15 @@ var getLogs = function(repoPath, searchString) {
       }, "");
     })
     .filter(Rx.helpers.identity)
-    .map(function(xml) {
-      return parser.toJson(xml, {
-        object: true,
-        trim: false
-      });
+    .flatMap(function(xml) {
+      parser.reset();
+      return Rx.Observable.fromNodeCallback(parser.parseString)(xml);
     })
     .pluck("log").pluck("logentry")
     .flatMap(function(entries) {
       return _.isArray(entries) ? entries : [entries];
     })
-    .map(cleanUpLogEntry);
 };
-
-var cleanUpLogEntry = function(entry) {
-
-  var cleanUpFunction = _.compose(
-    _.partial(renameProperty, "$t", "text"),
-    _.partial(deleteProperty, "xml:space")
-  );
-
-  var result = deepMap(entry, cleanUpFunction);
-
-  return result;
-}
-
-var deleteProperty = function(key, o) {
-  return _(o).omit(key);
-}
-
-var renameProperty = function(oldKeyName, newKeyName, o) {
-  if (_(o).has(oldKeyName)) {
-    var result = deleteProperty(oldKeyName, o);
-    result[newKeyName] = o[oldKeyName];
-    return result;
-  } else {
-    return _.clone(o);
-  }
-}
 
 /*
 Deep clones an object while applying function to each object
@@ -130,12 +115,18 @@ var getRepositories = function(rootPath) {
     .flatMap(function(item) {
       var dirFullPath = path.join(rootPath, item);
       return Rx.Observable.fromNodeCallback(fs.stat)(dirFullPath)
-        .filter(function(x) { return x.isDirectory(); })
-        .flatMap(function() { return Rx.Observable.fromNodeCallback(fs.readdir)(dirFullPath); })
+        .filter(function(x) {
+          return x.isDirectory();
+        })
+        .flatMap(function() {
+          return Rx.Observable.fromNodeCallback(fs.readdir)(dirFullPath);
+        })
         .filter(function(dirs) {
           return dirs.indexOf(".hg") !== -1;
         })
-        .map(function() { return dirFullPath });
+        .map(function() {
+          return dirFullPath
+        });
     });
 };
 
@@ -144,7 +135,12 @@ var getRepositories = function(rootPath) {
 var pullRepository = function(repositoryPath) {
   var repo = new hg.HGRepo();
   return Rx.Observable.fromNodeCallback(repo.pull, repo)(repositoryPath, {
-    "-R": repositoryPath
-  })
-  .map(function(output) { return { repo: repositoryPath, output: output }; });
+      "-R": repositoryPath
+    })
+    .map(function(output) {
+      return {
+        repo: repositoryPath,
+        output: output
+      };
+    });
 };

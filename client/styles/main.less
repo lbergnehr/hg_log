@@ -8,6 +8,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  .container-fluid();
 }
 
 * {
@@ -27,7 +28,9 @@ small {
 .changeset {
   background-color: @gray-lighter;
   .container-fluid();
-  margin-bottom: 5px;
+  .well();
+  margin-bottom: 8px;
+  padding-top: 8px;
 }
 
 .changesetheading {
@@ -41,18 +44,19 @@ small {
 }
 
 .changesetsummary {
-  .make-xs-column(7);
+  .make-xs-column(6);
+  font-size: @font-size-h4;
 }
 
 .changesetauthor {
   color: #333;
-  .make-xs-column(5);
+  .make-xs-column(6);
   padding-bottom: 5px;
 }
 
 .changesetfiles {  
   font-size: 0.8em;
-  .make-xs-column(5);
+  .make-xs-column(6);
   > .M {
     color: blue;
   }
@@ -66,7 +70,10 @@ small {
 
 .changesettext {
 	font-size: 0.8em;
-  .make-xs-column(7);
+  .make-xs-column(6);
+  > pre {
+    margin: 0px;
+  }
 }
 
 

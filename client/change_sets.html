@@ -12,6 +12,7 @@
 <template name="changeset">
 
   <div class="changesetheading">
+
     <div class="changesetauthor">
       <span class="name">{{author.text}}</span>
       <span class="email">({{author.email}})</span>
@@ -23,20 +24,21 @@
     <div class="changesetsummary">
       {{changesetsummary}}
     </div>
+
   </div>
 
   <div class="changesetbody">
     {{! Files }}
-    {{#each filePaths}}
     <div class="changesetfiles">
-      <span class="{{action}}">{{action}}</span> - {{text}}
+      {{#each filePaths}}
+      <span class="{{action}}">{{action}}</span> - {{text}}<br/>
+      {{/each}}
     </div>
-    {{/each}}
 
     {{! Commit message }}
     <div class="changesettext">
-      {{changesettext}}
+      <pre>{{changesettext}}</pre>
     </div>
-
+  
   </div>
 </template>
