@@ -26,5 +26,9 @@ Template.changeset.helpers({
       result = this.msg.text.substr(firstLineBreakPos + 1).trim();
     }
     return result;
+  },
+  shortFormId: function() {
+    return this.node.slice(0, 12);
   }
+
 });

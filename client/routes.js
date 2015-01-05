@@ -13,7 +13,11 @@ Router.route("changesets", {
     if (this.ready()) {
       var reponame = this.params.repoName;
       return {
-        changesets: Changesets.find(),
+        changesets: Changesets.find({}, {
+          sort: [
+            ["revision", "desc"]
+          ]
+        }),
         repoName: reponame
       };
     }

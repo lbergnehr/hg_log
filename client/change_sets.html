@@ -12,13 +12,12 @@
 <template name="changeset">
 
   <div class="changesetheading">
-
     <div class="changesetauthor">
       <span class="name">{{author.text}}</span>
       <span class="email">({{author.email}})</span>
       <br/>
       <small>
-        {{date}}
+         <span title="Changeset ID: {{node}}">{{shortFormId}}</span>, {{date}}
       </small>
     </div>
     <div class="changesetsummary">
