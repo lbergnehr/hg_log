@@ -34,10 +34,15 @@ HgLog.logResults = function(options) {
     });
 };
 
+HgLog.repositories = function() {
+  return pullIntervals;
+};
+
 var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
     return getRepositories(repoStoreRootPath);
-  });
+  })
+  .share();
 var pullResults = pullIntervals
   .flatMap(function(repoPath) {
     return pullRepository(repoPath);

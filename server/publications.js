@@ -19,3 +19,19 @@ Meteor.publish("changesets", function(repoName, searchString) {
     handle.dispose();
   });
 });
+
+Meteor.publish("repositories", function() {
+  var self = this;
+  self.ready();
+
+  var repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos/";
+
+  var handle = HgLog.repositories()
+    .subscribe(function(repo) {
+      self.added("repositories", repo, {path: repo});
+    });
+
+  this.onStop(function() {
+    handle.dispose();
+  });
+});
