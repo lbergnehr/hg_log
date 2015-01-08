@@ -1,16 +1,14 @@
 <template name="landingPage">
 {{#if repos.count}}
-Welcome, here's your repos:
-
-{{#each repos}}
-  <div>
-    {{#linkTo route="changesets"}} {{repoName}} {{/linkTo}}
+<h2 class="landing-title">Welcome to hg_log, here are your repositories</h2>
+  <div class="repos">
+    {{#each repos}}
+      <div>
+        {{#linkTo route="changesets" class="repo"}} {{repoName}} {{/linkTo}}
+      </div>
+    {{/each}}
   </div>
-{{/each}}
-
 {{else}}
-
-You don't have any repos :(
-
+  <h2 class="landing-title">You don't have any repos :(</h2>
 {{/if}}
 </template>
