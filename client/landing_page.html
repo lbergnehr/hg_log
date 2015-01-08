@@ -1,4 +1,5 @@
 <template name="landingPage">
+{{#if repos.count}}
 Welcome, here's your repos:
 
 {{#each repos}}
@@ -6,4 +7,10 @@ Welcome, here's your repos:
     {{#linkTo route="changesets"}} {{repoName}} {{/linkTo}}
   </div>
 {{/each}}
+
+{{else}}
+
+You don't have any repos :(
+
+{{/if}}
 </template>
