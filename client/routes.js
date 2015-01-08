@@ -9,7 +9,7 @@ Router.route("home", {
 });
 
 Router.route("changesets", {
-  path: "/:repoName/:searchString?",
+  path: "/log/:repoName/:searchString*",
 
   template: "changesets",
 
