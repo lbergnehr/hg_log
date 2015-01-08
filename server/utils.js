@@ -44,6 +44,7 @@ var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   })
   .share();
 var pullResults = pullIntervals
+  .flatMap(Rx.helpers.identity)
   .flatMap(function(repoPath) {
     return pullRepository(repoPath);
   })
@@ -132,7 +133,11 @@ var getRepositories = function(rootPath) {
         .map(function() {
           return dirFullPath
         });
-    });
+    })
+    .reduce(function(paths, path) {
+      paths.push(path);
+      return paths;
+    }, []);
 };
 
 // Pull from a specified repository.
