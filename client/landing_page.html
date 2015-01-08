@@ -3,7 +3,7 @@ Welcome, here's your repos:
 
 {{#each repos}}
   <div>
-    {{path}}
+    {{#linkTo route="changesets"}} {{repoName}} {{/linkTo}}
   </div>
 {{/each}}
 </template>

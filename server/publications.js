@@ -39,7 +39,7 @@ Meteor.publish("repositories", function() {
         .each(function(repoPath) {
           self.added("repositories", repoPath, {
             path: repoPath,
-            name: path.basename(repoPath)
+            repoName: path.basename(repoPath)
           });
         });
 
