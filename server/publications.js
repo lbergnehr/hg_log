@@ -19,3 +19,39 @@ Meteor.publish("changesets", function(repoName, searchString) {
     handle.dispose();
   });
 });
+
+Meteor.publish("repositories", function() {
+  var self = this;
+  self.ready();
+
+  var path = Meteor.npmRequire("path");
+  var handle = HgLog.repositories()
+    .distinctUntilChanged(function(x) { return x; }, _.isEqual)
+    .startWith([])
+    .bufferWithCount(2, 1)
+    .subscribe(function(repos) {
+      var lastSet = repos[0];
+      var newSet = repos[1];
+
+      // Added repos
+      _.chain(newSet)
+        .difference(lastSet)
+        .each(function(repoPath) {
+          self.added("repositories", repoPath, {
+            path: repoPath,
+            repoName: path.basename(repoPath)
+          });
+        });
+
+      // Removed repos
+      _.chain(lastSet)
+        .difference(newSet)
+        .each(function(repoPath) {
+          self.removed("repositories", repoPath);
+        });
+    });
+
+  this.onStop(function() {
+    handle.dispose();
+  });
+});

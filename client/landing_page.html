@@ -1,0 +1,14 @@
+<template name="landingPage">
+{{#if repos.count}}
+<h2 class="landing-title">Welcome to hg_log, here are your repositories</h2>
+  <div class="repos">
+    {{#each repos}}
+      <div>
+        {{#linkTo route="changesets" class="repo"}} {{repoName}} {{/linkTo}}
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <h2 class="landing-title">You don't have any repositories in <i>{{rootPath}}</i> :(</h2>
+{{/if}}
+</template>

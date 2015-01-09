@@ -1,3 +1,13 @@
+Router.route("home", {
+  path: "/",
+
+  template: "landingPage",
+
+  waitOn: function() {
+    return Meteor.subscribe("repositories");
+  }
+});
+
 Router.route("changesets", {
   path: "/:repoName/:searchString?",
 
