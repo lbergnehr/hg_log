@@ -4,6 +4,8 @@ var Rx = Meteor.npmRequire("Rx");
 var hg = Meteor.npmRequire("hg");
 var xml2js = Meteor.npmRequire("xml2js");
 
+HgLog.repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
+
 var parser = new xml2js.Parser({
   mergeAttrs: true,
   explicitArray: false,
@@ -17,8 +19,6 @@ var parser = new xml2js.Parser({
     }
   ]
 });
-
-var repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
 
 HgLog.pullResults = function() {
   return pullResults;
@@ -40,7 +40,7 @@ HgLog.repositories = function() {
 
 var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
-    return getRepositories(repoStoreRootPath);
+    return getRepositories(HgLog.repoStoreRootPath);
   })
   .share();
 var pullResults = pullIntervals
