@@ -1,6 +1,6 @@
 HgLog = {};
 
-var Rx = Meteor.npmRequire("Rx");
+var Rx = Meteor.npmRequire("rx");
 var hg = Meteor.npmRequire("hg");
 var xml2js = Meteor.npmRequire("xml2js");
 
