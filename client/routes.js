@@ -31,3 +31,7 @@ Router.route("/log/:repoName/:searchString(.*)?", {
     }
   }
 });
+
+Router.route("/diff/:repoName/:changeSetID/:fileName(.*)", {
+  name: "diff"
+});
