@@ -78,36 +78,10 @@ var getLogs = function(repoPath, searchString) {
     .flatMap(function(entries) {
       return _.isArray(entries) ? entries : [entries];
     })
-};
-
-/*
-Deep clones an object while applying function to each object
-in the "deep" object tree.
-The function is recursibly applied to:
-- the object itself
-- all property values that are objects
-- all objects in property values that are arrays
-
-func() takes one parameter, the object. 
-func() should return the new object.
-
-deepMap returns the new object. */
-var deepMap = function(o, func) {
-  if (typeof(o) == "array") {
-    return _(o).map(function(element) {
-      deepMap(element, func);
+    .do(function(entry) {
+      entry.revision = parseInt(entry.revision, 10);
     });
-  } else if (typeof(o) == "object") {
-    var result = func(o);
-    _(result).keys()
-      .forEach(function(key) {
-        result[key] = deepMap(result[key], func)
-      });
-    return result;
-  } else {
-    return _.clone(o);
-  }
-}
+};
 
 // Get hg repositories from a specified root directory.
 // Returns: An Observable which produces full paths to mercurial
