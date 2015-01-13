@@ -7,10 +7,12 @@ Meteor.publish("changesets", function(repoName, searchString) {
   var self = this;
   this.ready();
 
-  var repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos/";
-  var fullRepoPath = Npm.require("path").join(repoStoreRootPath, repoName);
+  var fullRepoPath = Npm.require("path").join(HgLog.repoStoreRootPath, repoName);
 
-  var handle = HgLog.logResults({repo: fullRepoPath, searchString: searchString})
+  var handle = HgLog.logResults({
+      repo: fullRepoPath,
+      searchString: searchString
+    })
     .subscribe(function(entry) {
       self.added("changesets", entry.node, entry);
     });
@@ -26,7 +28,9 @@ Meteor.publish("repositories", function() {
 
   var path = Meteor.npmRequire("path");
   var handle = HgLog.repositories()
-    .distinctUntilChanged(function(x) { return x; }, _.isEqual)
+    .distinctUntilChanged(function(x) {
+      return x;
+    }, _.isEqual)
     .startWith([])
     .bufferWithCount(2, 1)
     .subscribe(function(repos) {

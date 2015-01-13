@@ -29,6 +29,12 @@ Template.changeset.helpers({
   },
   shortFormId: function() {
     return this.node.slice(0, 12);
+  },
+  getDiffLinkData: function() {
+    return {
+      repoName: Router.current().data().repoName,
+      fileName: this.text,
+      changeSetID: Template.instance().data.revision
+    }
   }
-
 });
