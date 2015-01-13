@@ -4,6 +4,8 @@ var Rx = Meteor.npmRequire("rx");
 var hg = Meteor.npmRequire("hg");
 var xml2js = Meteor.npmRequire("xml2js");
 
+HgLog.repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
+
 var parser = new xml2js.Parser({
   mergeAttrs: true,
   explicitArray: false,
@@ -17,8 +19,6 @@ var parser = new xml2js.Parser({
     }
   ]
 });
-
-var repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
 
 HgLog.pullResults = function() {
   return pullResults;
@@ -38,9 +38,14 @@ HgLog.repositories = function() {
   return pullIntervals;
 };
 
+HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
+  var result = Meteor.wrapAsync(getFileDiff)(repoName, changeSetID, fileName);
+  return result;
+}
+
 var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
-    return getRepositories(repoStoreRootPath);
+    return getRepositories(HgLog.repoStoreRootPath);
   })
   .share();
 var pullResults = pullIntervals
@@ -128,3 +133,44 @@ var pullRepository = function(repositoryPath) {
       };
     });
 };
+
+var getFileDiff = function(repoName, changeSetID, fileName, callback) {
+  var hg = Meteor.npmRequire("hg");
+  var Rx = Meteor.npmRequire("rx");
+  var Path = Npm.require("path")
+
+  var fullRepoPath = Path.join(HgLog.repoStoreRootPath, repoName);
+
+  // There is no diff function in node_hg. The API is a bit dumb. We can however build
+  // any command by our selves. A generalized verion of this should probably be submitted as 
+  // a PR to node_hg. This is a bit of a hack but it will have to do for now.
+  var repo = new hg.HGRepo();
+  var rxWrappedDiffFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
+  var hgDiff = function(server) {
+    server.runcommand.apply(server, ["diff", "-R", fullRepoPath, "-c", changeSetID, fileName]);
+  }
+
+  // request the diff from the hg command server
+  var handle = rxWrappedDiffFunction(fullRepoPath, hgDiff)
+    .single()
+    .subscribe(function(data) {
+      // We have a result. Build the final result (a string) and call the callback with it.
+      var text = _(data[0])
+        .filter(function(rowObject) { // we only care about entries of the o channel
+          return rowObject.channel === 'o';
+        })
+        .map(function(rowObject) { // we want the text body
+          return rowObject.body;
+        })
+        .reduce(function(s, row) { // put everything into one string
+          return s.concat(row);
+        }, "");
+
+      var result = {};
+      result.changeSetID = changeSetID;
+      result.fileName = fileName;
+      result.text = text;
+
+      callback(null, result)
+    });
+}

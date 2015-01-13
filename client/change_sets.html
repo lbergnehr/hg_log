@@ -30,7 +30,11 @@
     {{! Files }}
     <div class="changesetfiles">
       {{#each filePaths}}
-      <span class="{{action}}">{{action}}</span> - {{text}}<br/>
+      <span class="{{action}}">{{action}}</span> - 
+      {{#linkTo route="diff" data=getDiffLinkData}}
+      <span>{{text}}</span> 
+      {{/linkTo}}
+      <br/>
       {{/each}}
     </div>
 

@@ -1,6 +1,5 @@
-Router.route("home", {
-  path: "/",
-
+Router.route("/", {
+  name: "home",
   template: "landingPage",
 
   waitOn: function() {
@@ -8,9 +7,8 @@ Router.route("home", {
   }
 });
 
-Router.route("changesets", {
-  path: "/:repoName/:searchString?",
-
+Router.route("/log/:repoName/:searchString(.*)?", {
+  name: "changesets",
   template: "changesets",
 
   waitOn: function() {
@@ -32,4 +30,8 @@ Router.route("changesets", {
       };
     }
   }
+});
+
+Router.route("/diff/:repoName/:changeSetID/:fileName(.*)", {
+  name: "diff"
 });

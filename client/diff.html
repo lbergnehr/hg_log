@@ -1,0 +1,12 @@
+<template name="diff">
+	<div class="diffview">
+	<code>
+		{{#each lines}}
+		{{#if isLocator}}
+		<hr/>
+		{{/if}}
+		<samp {{rowAttributes}}>{{.}}</samp>
+		{{/each}}
+	</code>
+	</div>
+</template>
