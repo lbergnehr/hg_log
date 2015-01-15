@@ -38,6 +38,32 @@ HgLog.repositories = function() {
   return pullIntervals;
 };
 
+var bufferedRepositories = function() {
+  return pullIntervals.distinctUntilChanged(function(x) {
+    return x;
+  }, _.isEqual)
+  .startWith([])
+  .bufferWithCount(2, 1);
+}
+
+HgLog.addedRepositories = function() {
+  return bufferedRepositories().flatMap(function(repos) {
+    var lastSet = repos[0];
+    var newSet = repos[1];
+
+    return _(newSet).difference(lastSet);
+  });
+};
+
+HgLog.removedRepositories = function() {
+  return bufferedRepositories().flatMap(function(repos) {
+    var lastSet = repos[0];
+    var newSet = repos[1];
+
+    return _(lastSet).difference(newSet);
+  });
+};
+
 HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
   var result = Meteor.wrapAsync(getFileDiff)(repoName, changeSetID, fileName);
   return result;
