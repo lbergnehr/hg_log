@@ -1,24 +1,6 @@
+/* hg_log API */
+
 HgLog = {};
-
-var Rx = Meteor.npmRequire("rx");
-var hg = Meteor.npmRequire("hg");
-var xml2js = Meteor.npmRequire("xml2js");
-
-HgLog.repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
-
-var parser = new xml2js.Parser({
-  mergeAttrs: true,
-  explicitArray: false,
-  charkey: "text",
-  strict: false,
-  normalizeTags: true,
-  attrNameProcessors: [
-
-    function(attr) {
-      return attr.toLowerCase();
-    }
-  ]
-});
 
 HgLog.pullResults = function() {
   return pullResults;
@@ -37,14 +19,6 @@ HgLog.logResults = function(options) {
 HgLog.repositories = function() {
   return pullIntervals;
 };
-
-var bufferedRepositories = function() {
-  return pullIntervals.distinctUntilChanged(function(x) {
-    return x;
-  }, _.isEqual)
-  .startWith([])
-  .bufferWithCount(2, 1);
-}
 
 HgLog.addedRepositories = function() {
   return bufferedRepositories().flatMap(function(repos) {
@@ -69,11 +43,42 @@ HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
   return result;
 }
 
+/* Internal functions */
+
+var Rx = Meteor.npmRequire("rx");
+var hg = Meteor.npmRequire("hg");
+var xml2js = Meteor.npmRequire("xml2js");
+
+HgLog.repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
+
+var parser = new xml2js.Parser({
+  mergeAttrs: true,
+  explicitArray: false,
+  charkey: "text",
+  strict: false,
+  normalizeTags: true,
+  attrNameProcessors: [
+
+    function(attr) {
+      return attr.toLowerCase();
+    }
+  ]
+});
+
+var bufferedRepositories = function() {
+  return pullIntervals.distinctUntilChanged(function(x) {
+    return x;
+  }, _.isEqual)
+  .startWith([])
+  .bufferWithCount(2, 1);
+}
+
 var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
     return getRepositories(HgLog.repoStoreRootPath);
   })
   .share();
+
 var pullResults = pullIntervals
   .flatMap(Rx.helpers.identity)
   .flatMap(function(repoPath) {
@@ -167,9 +172,10 @@ var getFileDiff = function(repoName, changeSetID, fileName, callback) {
 
   var fullRepoPath = Path.join(HgLog.repoStoreRootPath, repoName);
 
-  // There is no diff function in node_hg. The API is a bit dumb. We can however build
-  // any command by our selves. A generalized verion of this should probably be submitted as 
-  // a PR to node_hg. This is a bit of a hack but it will have to do for now.
+  // There is no diff function in node_hg. The API is a bit dumb. We can
+  // however build any command by our selves. A generalized verion of this
+  // should probably be submitted as a PR to node_hg. This is a bit of a hack
+  // but it will have to do for now.
   var repo = new hg.HGRepo();
   var rxWrappedDiffFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
   var hgDiff = function(server) {
