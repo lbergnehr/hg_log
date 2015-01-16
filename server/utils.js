@@ -2,10 +2,6 @@
 
 HgLog = {};
 
-HgLog.pullResults = function() {
-  return pullResults;
-};
-
 HgLog.logResults = function(options) {
   return pullResults
     .filter(function(result) {
