@@ -40,7 +40,7 @@ HgLog.logResults = function(options) {
 HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
   var result = Meteor.wrapAsync(getFileDiff)(repoName, changeSetID, fileName);
   return result;
-}
+};
 
 /* Internal functions */
 
@@ -69,7 +69,7 @@ var bufferedRepositories = function() {
     return x;
   }, _.isEqual)
   .startWith([])
-  .bufferWithCount(2, 1);
+  .pairwise();
 }
 
 var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
