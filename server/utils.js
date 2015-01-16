@@ -2,16 +2,7 @@
 
 HgLog = {};
 
-HgLog.logResults = function(options) {
-  return pullResults
-    .filter(function(result) {
-      return result.repo === options.repo;
-    })
-    .flatMap(function(result) {
-      return getLogs(result.repo, options.searchString);
-    });
-};
-
+/* Information about repositories */
 HgLog.repositories = function() {
   return pullIntervals;
 };
@@ -34,6 +25,18 @@ HgLog.removedRepositories = function() {
   });
 };
 
+/* Log results for a specific repository */
+HgLog.logResults = function(options) {
+  return pullResults
+    .filter(function(result) {
+      return result.repo === options.repo;
+    })
+    .flatMap(function(result) {
+      return getLogs(result.repo, options.searchString);
+    });
+};
+
+/* Diff for specific repo, changeset and file */
 HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
   var result = Meteor.wrapAsync(getFileDiff)(repoName, changeSetID, fileName);
   return result;
