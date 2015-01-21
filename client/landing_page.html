@@ -1,14 +1,58 @@
 <template name="landingPage">
-{{#if repos.count}}
-<h2 class="landing-title">Welcome to hg_log, here are your repositories</h2>
-  <div class="repos">
-    {{#each repos}}
+  <div class="overlay">
+    <a href="#" class="close-search"><span class="hotkey">[esc]</span> ×</a>
+
+    <h1>Search your repositories</h1>
+    
+    <h2> 
+     {{#if reactiveVar "actualRepo"}}
+    Search for {{reactiveVar "searchText"}}
+      in {{reactiveVar "actualRepo"}}
+      {{else}}
+      ...
+      {{/if}}
+      
+    </h2>
+    <div class="clearfix">
+      <form id="searchForm" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-xs-2 control-label" for="searchInput">search string:</label>  
+          <div class="col-xs-10">
+            <input class="form-control input-lg" id="searchInput" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-xs-2 control-label" for="repoInput">repository:</label>  
+          <div class="col-xs-10">
+            <input class="form-control input-lg" id="repoInput" />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix">
+      {{#if reactiveVar "repoText"}}
+      <ul class="matchingRepos">
+        {{#each searchResults}}
+        <li>{{repoName}}</li>
+        {{else}}
+          <span class="error">no matching repository</span>
+      {{/each}}
+     </ul>
+     {{/if}}
+    </div>
+  </div>
+  <div class="landingPage">
+    {{#if repos.count}}
+    <h2 class="landing-title">Welcome to hg_log, here are your repositories</h2>
+    <div class="repos">
+      {{#each repos}}
       <div>
         {{#linkTo route="changesets" class="repo"}} {{repoName}} {{/linkTo}}
       </div>
-    {{/each}}
+      {{/each}}
+    </div>
+    {{else}}
+    <h2 class="landing-title">You don't have any repositories in <i>{{rootPath}}</i> :(</h2>
+    {{/if}}
   </div>
-{{else}}
-  <h2 class="landing-title">You don't have any repositories in <i>{{rootPath}}</i> :(</h2>
-{{/if}}
 </template>
