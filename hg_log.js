@@ -1,4 +1,48 @@
+/* hg_log API */
+
 HgLog = {};
+
+/* Information about repositories */
+HgLog.repositories = function() {
+  return pullIntervals;
+};
+
+HgLog.addedRepositories = function() {
+  return bufferedRepositories().flatMap(function(repos) {
+    var lastSet = repos[0];
+    var newSet = repos[1];
+
+    return _(newSet).difference(lastSet);
+  });
+};
+
+HgLog.removedRepositories = function() {
+  return bufferedRepositories().flatMap(function(repos) {
+    var lastSet = repos[0];
+    var newSet = repos[1];
+
+    return _(lastSet).difference(newSet);
+  });
+};
+
+/* Log results for a specific repository */
+HgLog.logResults = function(options) {
+  return pullResults
+    .filter(function(result) {
+      return result.repo === options.repo;
+    })
+    .flatMap(function(result) {
+      return getLogs(result.repo, options.searchString);
+    });
+};
+
+/* Diff for specific repo, changeset and file */
+HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
+  var result = Meteor.wrapAsync(getFileDiff)(repoName, changeSetID, fileName);
+  return result;
+};
+
+/* Internal functions */
 
 var Rx = Meteor.npmRequire("rx");
 var hg = Meteor.npmRequire("hg");
@@ -20,27 +64,12 @@ var parser = new xml2js.Parser({
   ]
 });
 
-HgLog.pullResults = function() {
-  return pullResults;
-};
-
-HgLog.logResults = function(options) {
-  return pullResults
-    .filter(function(result) {
-      return result.repo === options.repo;
-    })
-    .flatMap(function(result) {
-      return getLogs(result.repo, options.searchString);
-    });
-};
-
-HgLog.repositories = function() {
-  return pullIntervals;
-};
-
-HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
-  var result = Meteor.wrapAsync(getFileDiff)(repoName, changeSetID, fileName);
-  return result;
+var bufferedRepositories = function() {
+  return pullIntervals.distinctUntilChanged(function(x) {
+    return x;
+  }, _.isEqual)
+  .startWith([])
+  .pairwise();
 }
 
 var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
@@ -48,6 +77,7 @@ var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
     return getRepositories(HgLog.repoStoreRootPath);
   })
   .share();
+
 var pullResults = pullIntervals
   .flatMap(Rx.helpers.identity)
   .flatMap(function(repoPath) {
@@ -141,9 +171,10 @@ var getFileDiff = function(repoName, changeSetID, fileName, callback) {
 
   var fullRepoPath = Path.join(HgLog.repoStoreRootPath, repoName);
 
-  // There is no diff function in node_hg. The API is a bit dumb. We can however build
-  // any command by our selves. A generalized verion of this should probably be submitted as 
-  // a PR to node_hg. This is a bit of a hack but it will have to do for now.
+  // There is no diff function in node_hg. The API is a bit dumb. We can
+  // however build any command by our selves. A generalized verion of this
+  // should probably be submitted as a PR to node_hg. This is a bit of a hack
+  // but it will have to do for now.
   var repo = new hg.HGRepo();
   var rxWrappedDiffFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
   var hgDiff = function(server) {
