@@ -4,7 +4,7 @@ HgLog = {};
 
 /* Information about repositories */
 HgLog.repositories = function() {
-  return pullIntervals;
+  return repositoryPaths;
 };
 
 HgLog.addedRepositories = function() {
@@ -65,20 +65,20 @@ var parser = new xml2js.Parser({
 });
 
 var bufferedRepositories = function() {
-  return pullIntervals.distinctUntilChanged(function(x) {
+  return repositoryPaths.distinctUntilChanged(function(x) {
     return x;
   }, _.isEqual)
   .startWith([])
   .pairwise();
-}
+};
 
-var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
+var repositoryPaths = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
     return getRepositories(HgLog.repoStoreRootPath);
   })
   .share();
 
-var pullResults = pullIntervals
+var pullResults = repositoryPaths
   .flatMap(Rx.helpers.identity)
   .flatMap(function(repoPath) {
     return pullRepository(repoPath);
