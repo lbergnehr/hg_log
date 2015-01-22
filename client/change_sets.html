@@ -13,11 +13,10 @@
 
   <div class="changesetheading">
     <div class="changesetauthor">
-      <span class="name">{{author.text}}</span>
-      <span class="email">({{author.email}})</span>
+      <span class="name">{{user}}</span>
       <br/>
       <small>
-         <span title="Changeset ID: {{node}}">{{shortFormId}}</span>, {{date}}
+         <span title="Changeset ID: {{node}}">{{shortFormId}}</span>, {{niceTime}}
       </small>
     </div>
     <div class="changesetsummary">
@@ -29,10 +28,10 @@
   <div class="changesetbody">
     {{! Files }}
     <div class="changesetfiles">
-      {{#each filePaths}}
-      <span class="{{action}}">{{action}}</span> - 
+      {{#each files}}
+      <!-- <span class="{{action}}">{{action}}</span> - -->
       {{#linkTo route="diff" data=getDiffLinkData}}
-      <span>{{text}}</span> 
+      <span>{{.}}</span> 
       {{/linkTo}}
       <br/>
       {{/each}}

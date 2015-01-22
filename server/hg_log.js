@@ -46,23 +46,8 @@ HgLog.getFileDiffSync = function(repoName, changeSetID, fileName) {
 
 var Rx = Meteor.npmRequire("rx");
 var hg = Meteor.npmRequire("hg");
-var xml2js = Meteor.npmRequire("xml2js");
 
 HgLog.repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
-
-var parser = new xml2js.Parser({
-  mergeAttrs: true,
-  explicitArray: false,
-  charkey: "text",
-  strict: false,
-  normalizeTags: true,
-  attrNameProcessors: [
-
-    function(attr) {
-      return attr.toLowerCase();
-    }
-  ]
-});
 
 var bufferedRepositories = function() {
   return repositoryPaths.distinctUntilChanged(function(x) {
@@ -114,7 +99,7 @@ var pullResults = repositoryPaths
 // Returns: An Observable which produces log messages from hg.
 var getLogs = function(repoPath, searchString) {
   var options = {
-    "--template": "xml",
+    "--template": "json",
     "-v": ""
   };
 
@@ -129,16 +114,12 @@ var getLogs = function(repoPath, searchString) {
       }, "");
     })
     .filter(Rx.helpers.identity)
-    .flatMap(function(xml) {
-      parser.reset();
-      return Rx.Observable.fromNodeCallback(parser.parseString)(xml);
-    })
-    .pluck("log").pluck("logentry")
-    .flatMap(function(entries) {
-      return _.isArray(entries) ? entries : [entries];
+    .flatMap(function(json) {
+      var entries = JSON.parse(json);
+      return Rx.Observable.fromArray(_.isArray(entries) ? entries : [entries]);
     })
     .do(function(entry) {
-      entry.revision = parseInt(entry.revision, 10);
+      entry.revision = parseInt(entry.rev, 10);
     });
 };
 
