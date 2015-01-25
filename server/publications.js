@@ -13,6 +13,7 @@ Meteor.publish("changesets", function(repoName, searchString) {
       repo: fullRepoPath,
       searchString: searchString
     })
+    .retry()
     .subscribe(function(entry) {
       self.added("changesets", entry.node, entry);
     });
