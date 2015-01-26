@@ -78,8 +78,32 @@ var repositoryPaths = Rx.Observable.timer(0, Meteor.settings.pollInterval || 100
   })
   .share();
 
+var getRepositoryTip = function(repoPath) {
+  var repo = new hg.HGRepo();
+  var rxWrappedTipFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
+  var hgTip = function(server) {
+    server.runcommand.call(server, "tip");
+  };
+
+  return rxWrappedTipFunction(repoPath, hgTip)
+    .map(function(output) {
+      return output[0][0].body;
+    });
+};
+
 var pullResults = repositoryPaths
   .flatMap(Rx.helpers.identity)
+  .flatMap(function(repoPath) {
+    return getRepositoryTip(repoPath)
+      .map(function(tip) {
+        return{
+          repoPath: repoPath,
+          tip: tip
+        }
+      });
+  })
+  .distinctUntilChanged(function(x) { return x.tip; })
+  .pluck("repoPath")
   .flatMap(function(repoPath) {
     return pullRepository(repoPath);
   })
