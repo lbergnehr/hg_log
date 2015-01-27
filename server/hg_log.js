@@ -4,7 +4,7 @@ HgLog = {};
 
 /* Information about repositories */
 HgLog.repositories = function() {
-  return pullIntervals;
+  return repositoryPaths;
 };
 
 HgLog.addedRepositories = function() {
@@ -65,21 +65,45 @@ var parser = new xml2js.Parser({
 });
 
 var bufferedRepositories = function() {
-  return pullIntervals.distinctUntilChanged(function(x) {
+  return repositoryPaths.distinctUntilChanged(function(x) {
     return x;
   }, _.isEqual)
   .startWith([])
   .pairwise();
-}
+};
 
-var pullIntervals = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
+var repositoryPaths = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
   .flatMap(function() {
     return getRepositories(HgLog.repoStoreRootPath);
   })
   .share();
 
-var pullResults = pullIntervals
+var getRepositoryTip = function(repoPath) {
+  var repo = new hg.HGRepo();
+  var rxWrappedTipFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
+  var hgTip = function(server) {
+    server.runcommand.call(server, "tip");
+  };
+
+  return rxWrappedTipFunction(repoPath, hgTip)
+    .map(function(output) {
+      return output[0][0].body;
+    });
+};
+
+var pullResults = repositoryPaths
   .flatMap(Rx.helpers.identity)
+  .flatMap(function(repoPath) {
+    return getRepositoryTip(repoPath)
+      .map(function(tip) {
+        return{
+          repoPath: repoPath,
+          tip: tip
+        }
+      });
+  })
+  .distinctUntilChanged(function(x) { return x.tip; })
+  .pluck("repoPath")
   .flatMap(function(repoPath) {
     return pullRepository(repoPath);
   })
