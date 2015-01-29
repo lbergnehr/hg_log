@@ -13,17 +13,21 @@ Template.changeset.helpers({
 
     return paths;
   },
+  niceTime: function() {
+    var date = new Date(this.date[0] * 1000);
+    return date.toLocaleTimeString() + " " + date.toLocaleDateString();
+  },
   changesetsummary: function() {
-    return this.msg.text.split('\n')[0];
+    return this.desc.split('\n')[0];
   },
   changesettext: function() {
     var result = "";
-    var firstLineBreakPos = this.msg.text.indexOf('\n');
+    var firstLineBreakPos = this.desc.indexOf('\n');
 
     // Check if there is a line break and it is not at the end of the message
-    if ((firstLineBreakPos != -1) && ((firstLineBreakPos + 1) < this.msg.text.length)) {
+    if ((firstLineBreakPos != -1) && ((firstLineBreakPos + 1) < this.desc.length)) {
       //multiline comment
-      result = this.msg.text.substr(firstLineBreakPos + 1).trim();
+      result = this.desc.substr(firstLineBreakPos + 1).trim();
     }
     return result;
   },
@@ -33,7 +37,7 @@ Template.changeset.helpers({
   getDiffLinkData: function() {
     return {
       repoName: Router.current().data().repoName,
-      fileName: this.text,
+      fileName: this,
       changeSetID: Template.instance().data.revision
     }
   }
