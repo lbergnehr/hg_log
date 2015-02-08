@@ -51,10 +51,10 @@ HgLog.repoStoreRootPath = Meteor.settings.repoStoreRootPath || "/tmp/repos";
 
 var bufferedRepositories = function() {
   return repositoryPaths.distinctUntilChanged(function(x) {
-    return x;
-  }, _.isEqual)
-  .startWith([])
-  .pairwise();
+      return x;
+    }, _.isEqual)
+    .startWith([])
+    .pairwise();
 };
 
 var repositoryPaths = Rx.Observable.timer(0, Meteor.settings.pollInterval || 1000)
@@ -63,14 +63,25 @@ var repositoryPaths = Rx.Observable.timer(0, Meteor.settings.pollInterval || 100
   })
   .share();
 
-var getRepositoryTip = function(repoPath) {
+// There is no tip function in node_hg. The API is a bit dumb. We can
+// however build any command by our selves. This is a bit of a hack
+// but it will have to do for now.
+var runHgCommand = function(repoPath) {
   var repo = new hg.HGRepo();
-  var rxWrappedTipFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
-  var hgTip = function(server) {
-    server.runcommand.call(server, "tip");
+  var rxWrapped_runCommandGetOutput = Rx.Observable
+    .fromNodeCallback(repo._runCommandGetOutput, repo);
+
+  var hgArgs = Array.prototype.slice.call(arguments, 1);
+  var func = function(server) {
+    server.runcommand.apply(server, hgArgs);
   };
 
-  return rxWrappedTipFunction(repoPath, hgTip)
+  return rxWrapped_runCommandGetOutput(repoPath, func)
+}
+
+var getRepositoryTip = function(repoPath) {
+
+  return runHgCommand(repoPath, "tip")
     .map(function(output) {
       return output[0][0].body;
     });
@@ -81,13 +92,15 @@ var pullResults = repositoryPaths
   .flatMap(function(repoPath) {
     return getRepositoryTip(repoPath)
       .map(function(tip) {
-        return{
+        return {
           repoPath: repoPath,
           tip: tip
         }
       });
   })
-  .distinctUntilChanged(function(x) { return x.tip; })
+  .distinctUntilChanged(function(x) {
+    return x.tip;
+  })
   .pluck("repoPath")
   .flatMap(function(repoPath) {
     return pullRepository(repoPath);
@@ -170,24 +183,12 @@ var pullRepository = function(repositoryPath) {
 };
 
 var getFileDiff = function(repoName, changeSetID, fileName, callback) {
-  var hg = Meteor.npmRequire("hg");
-  var Rx = Meteor.npmRequire("rx");
   var Path = Npm.require("path")
 
   var fullRepoPath = Path.join(HgLog.repoStoreRootPath, repoName);
 
-  // There is no diff function in node_hg. The API is a bit dumb. We can
-  // however build any command by our selves. A generalized verion of this
-  // should probably be submitted as a PR to node_hg. This is a bit of a hack
-  // but it will have to do for now.
-  var repo = new hg.HGRepo();
-  var rxWrappedDiffFunction = Rx.Observable.fromNodeCallback(repo._runCommandGetOutput, repo);
-  var hgDiff = function(server) {
-    server.runcommand.apply(server, ["diff", "-R", fullRepoPath, "-c", changeSetID, fileName]);
-  }
-
   // request the diff from the hg command server
-  var handle = rxWrappedDiffFunction(fullRepoPath, hgDiff)
+  var handle = runHgCommand(fullRepoPath, "diff", "-c", changeSetID, fileName)
     .single()
     .subscribe(function(data) {
       // We have a result. Build the final result (a string) and call the callback with it.
