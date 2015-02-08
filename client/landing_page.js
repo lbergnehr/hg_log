@@ -114,13 +114,19 @@ Template.landingPage.rendered = function() {
   // initial state
   instance.hideOverlay();
   instance.$("#repoInput").val(instance.repoText.get());
+  instance.onBodyKeyPress = function(event) {
+    if (!$searchInput.val()) {
+      instance.showOverlay()
+    }
+  }
 
   var $searchInput = instance.$("#searchInput");
   //Basically, for now, you can attach an event handler to the body element directly. 
   //Wait until the template is  rendered, and then used jQuery to attach the handler:
-  $("body").keypress(function(event) {
-    if (!$searchInput.val()) {
-      instance.showOverlay()
-    }
-  });
+  $("body").keypress(instance.onBodyKeyPress);
 }
+
+Template.landingPage.destroyed = function() {
+  var instance = this;
+  $("body").off("keypress", null, instance.onBodyKeyPress);
+};
