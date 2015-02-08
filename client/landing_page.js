@@ -7,7 +7,7 @@ Template.landingPage.created = function() {
 
   self.reposRootPath = new ReactiveVar("");
   self.searchText = new ReactiveVar("");
-  self.repoText = new ReactiveVar("");
+  self.repoText = new ReactiveVar(Session.get("lastRepoName"));
   self.actualRepo = new ReactiveVar("");
 
   self.hideOverlay = function() {
@@ -71,9 +71,6 @@ Template.landingPage.events({
   'click .close-search': function() {
     Template.instance().hideOverlay();
   },
-  'submit form': function() {
-    console.log('hello');
-  },
   'blur #repoInput': function(event) {
     var instance = Template.instance();
     var repo = instance.actualRepo.get();
@@ -99,9 +96,13 @@ Template.landingPage.events({
     }
 
     if (keyENTER && instance.actualRepo.get()) {
+      var repoName = instance.actualRepo.get();
+      var searchString = instance.searchText.get();
+      Session.set("lastRepoName", repoName);
+
       Router.go('changesets', {
-        repoName: instance.actualRepo.get(),
-        searchString: instance.searchText.get()
+        repoName: repoName,
+        searchString: searchString
       });
     }
   }
@@ -112,9 +113,9 @@ Template.landingPage.rendered = function() {
   var instance = this;
   // initial state
   instance.hideOverlay();
+  instance.$("#repoInput").val(instance.repoText.get());
 
   var $searchInput = instance.$("#searchInput");
-
   //Basically, for now, you can attach an event handler to the body element directly. 
   //Wait until the template is  rendered, and then used jQuery to attach the handler:
   $("body").keypress(function(event) {
