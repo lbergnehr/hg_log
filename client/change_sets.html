@@ -1,5 +1,6 @@
 <template name="changesets">
-  <h3>Matching change set(s) in {{repoName}}</h3>
+  {{#if anyMatchingChangeSet}}
+  <h3>Changeset(s) in {{repoName}} {{#if searchString }} matching {{searchString}} {{/if}} </h3>
   <div class="changesets">  
     {{#each changesets}}
     <div class="changeset">
@@ -7,6 +8,9 @@
     </div>
     {{/each}}
   </div>
+  {{else}}
+  <h3>No changesets in {{repoName}} {{#if searchString }} matching {{searchString}} {{/if}}</h3>
+  {{/if}}
 </template>
 
 <template name="changeset">
