@@ -14,18 +14,31 @@ Template.landingPage.created = function() {
     self.$("#searchInput")
       .val("")
       .blur();
-    self.$(".overlay").hide();
-    self.$(".landingPage").show();
-    self.$(".landingPage").find("a").removeAttr("tabindex");
-    self.$(".overlay").find("input").attr("tabindex", "-1");
+
+    self.$(".landingPage")
+      .show()
+      .find("a")
+      .removeAttr("tabindex");
+
+    self.$(".overlay")
+      .hide()
+      .find("input")
+      .attr("tabindex", "-1");
   }
 
   self.showOverlay = function() {
-    self.$(".landingPage").hide();
-    self.$(".overlay").show();
-    self.$("#searchInput").focus();
-    self.$(".landingPage").find("a").attr("tabindex", "-1");
-    self.$(".overlay").find("input").removeAttr("tabindex");
+    self.$(".landingPage")
+      .hide()
+      .find("a")
+      .attr("tabindex", "-1");
+
+    self.$(".overlay")
+      .show()
+      .find("input")
+      .removeAttr("tabindex");
+
+    self.$("#searchInput")
+      .focus();
   }
 
   self.autorun(function() {
