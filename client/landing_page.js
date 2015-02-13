@@ -6,7 +6,6 @@ Template.landingPage.created = function() {
   var self = this;
 
   self.reposRootPath = new ReactiveVar("");
-  self.searchText = new ReactiveVar("");
   self.repoText = new ReactiveVar(Session.get("lastRepoName"));
   self.actualRepo = new ReactiveVar("");
 
@@ -90,10 +89,6 @@ Template.landingPage.events({
     instance.repoText.set(repo);
     $(event.currentTarget).val(repo);
   },
-  'keyup #searchInput': function(event) {
-    var instance = Template.instance();
-    instance.searchText.set(event.target.value);
-  },
   'keyup #repoInput': function(event) {
     var instance = Template.instance();
     instance.repoText.set(event.target.value);
@@ -110,7 +105,9 @@ Template.landingPage.events({
 
     if (keyENTER && instance.actualRepo.get()) {
       var repoName = instance.actualRepo.get();
-      var searchString = instance.searchText.get();
+      var searchString = instance
+        .$('#searchInput')
+        .val();
       Session.set("lastRepoName", repoName);
 
       Router.go('changesets', {
