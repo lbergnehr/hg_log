@@ -1,6 +1,9 @@
 Template.changesets.helpers({
   changesets: function() {
     return this.changesets;
+  },
+  anyMatchingChangeSet: function() {
+    return this.changesets.count() > 0;
   }
 });
 
