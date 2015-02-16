@@ -13,7 +13,7 @@ Router.route("/log/:repoName/:searchString(.*)?", {
 
   waitOn: function() {
     var params = this.params;
-    return Meteor.subscribe("changesets", params.repoName, params.searchString);
+    return Meteor.subscribe("changesets", params.repoName, params.searchString, params.query && parseInt(params.query.maxResults));
   },
 
   data: function() {

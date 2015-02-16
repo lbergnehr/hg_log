@@ -32,7 +32,12 @@ HgLog.logResults = function(options) {
       return result.repo === options.repo;
     })
     .flatMap(function(result) {
-      return getLogs(result.repo, options.searchString);
+      var sequence = getLogs(result.repo, options.searchString);
+      if (options.maxResults) {
+        sequence = sequence.take(options.maxResults);
+      }
+
+      return sequence;
     });
 };
 
