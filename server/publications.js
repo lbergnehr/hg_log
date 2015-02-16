@@ -1,6 +1,7 @@
-Meteor.publish("changesets", function(repoName, searchString) {
+Meteor.publish("changesets", function(repoName, searchString, maxResults) {
   check(repoName, String);
   check(searchString, Match.OneOf(String, undefined, null));
+  check(maxResults, Match.Optional(Match.Integer));
 
   var hg = Meteor.npmRequire("hg");
 
@@ -11,7 +12,8 @@ Meteor.publish("changesets", function(repoName, searchString) {
 
   var handle = HgLog.logResults({
       repo: fullRepoPath,
-      searchString: searchString
+      searchString: searchString,
+      maxResults: maxResults
     })
     .retry()
     .subscribe(function(entry) {
